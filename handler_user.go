@@ -57,6 +57,27 @@ func handlerRegister(s *state, cmd command) error {
 	return nil
 }
 
+func handlerUsers(s *state, cmd command) error {
+	if len(cmd.username) != 0 {
+		return fmt.Errorf("usage: %s", cmd.name)
+	}
+
+	params, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to get users: %s", err)
+	}
+
+	for _, value := range params {
+		if value.Name == s.config.CurrentUsername {
+			fmt.Printf(" * %v (current)\n", s.config.CurrentUsername)
+		} else {
+			fmt.Printf(" * %v\n", value.Name)
+		}
+	}
+
+	return nil
+}
+
 func handlerReset(s *state, cmd command) error {
 	if len(cmd.username) != 0 {
 		return fmt.Errorf("usage: %s", cmd.name)

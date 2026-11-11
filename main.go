@@ -40,6 +40,7 @@ func main() {
 			"login":    handlerLogin,
 			"register": handlerRegister,
 			"reset":    handlerReset,
+			"users":    handlerUsers,
 		},
 	}
 
@@ -64,5 +65,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%v", cfg)
 }
