@@ -56,3 +56,15 @@ func handlerRegister(s *state, cmd command) error {
 	fmt.Printf(" * CreatedAt: %v\n", params.CreatedAt)
 	return nil
 }
+
+func handlerReset(s *state, cmd command) error {
+	if len(cmd.username) != 0 {
+		return fmt.Errorf("usage: %s", cmd.name)
+	}
+
+	err := s.db.DeleteUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to reset database: %s", err)
+	}
+	return nil
+}
