@@ -5,24 +5,24 @@ import (
 )
 
 type command struct {
-	name     string
-	username []string
+	Name string
+	Args []string
 }
 
 type commands struct {
-	commands map[string]func(*state, command) error
+	registerCommands map[string]func(*state, command) error
 }
 
 func (c *commands) run(s *state, cmd command) error {
-	handler, ok := c.commands[cmd.name]
+	handler, ok := c.registerCommands[cmd.Name]
 
 	if !ok {
-		return fmt.Errorf("unknown command: %s\n", cmd.name)
+		return fmt.Errorf("unknown command: %s\n", cmd.Name)
 	}
 
 	return handler(s, cmd)
 }
 
 func (c *commands) register(name string, f func(*state, command) error) {
-	c.commands[name] = f
+	c.registerCommands[name] = f
 }

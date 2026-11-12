@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -12,57 +11,45 @@ import (
 )
 
 type state struct {
-	config *config.Config
 	db     *database.Queries
+	config *config.Config
 }
 
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error reading config: %v", err)
 	}
 
-	dbURL := cfg.DbURL
-	db, err := sql.Open("postgres", dbURL)
+	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error connecting to db: %v", err)
 	}
+	defer db.Close()
+	dbQueries := database.New(db)
 
-	d := database.New(db)
-
-	s := &state{
+	programState := &state{
+		db:     dbQueries,
 		config: &cfg,
-		db:     d,
 	}
 
-	cmds := &commands{
-		commands: map[string]func(*state, command) error{
-			"login":    handlerLogin,
-			"register": handlerRegister,
-			"reset":    handlerReset,
-			"users":    handlerUsers,
-			"agg":      handlerAgg,
-		},
+	cmds := commands{
+		registerCommands: make(map[string]func(*state, command) error),
 	}
+	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerUsers)
+	cmds.register("agg", handlerAgg)
 
 	if len(os.Args) < 2 {
-		fmt.Println("not enough arguments were provided")
-		os.Exit(1)
+		log.Fatal("Usage: cli <command> [args...]")
 	}
 
-	c := command{
-		name:     os.Args[1],
-		username: os.Args[2:],
-	}
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
 
-	err = cmds.run(s, c)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	// Read again from disk to confirm write worked
-	cfg, err = config.Read()
+	err = cmds.run(programState, command{Name: cmdName, Args: cmdArgs})
 	if err != nil {
 		log.Fatal(err)
 	}

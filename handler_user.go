@@ -11,11 +11,11 @@ import (
 )
 
 func handlerLogin(s *state, cmd command) error {
-	if len(cmd.username) == 0 {
+	if len(cmd.Args) == 0 {
 		return errors.New("username is required")
 	}
 
-	name := cmd.username[0]
+	name := cmd.Args[0]
 
 	name, err := s.db.GetUser(context.Background(), name)
 	if err != nil {
@@ -30,11 +30,11 @@ func handlerLogin(s *state, cmd command) error {
 }
 
 func handlerRegister(s *state, cmd command) error {
-	if len(cmd.username) != 1 {
-		return fmt.Errorf("usage: %s <name>", cmd.name)
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
 
-	name := cmd.username[0]
+	name := cmd.Args[0]
 	now := time.Now()
 	params, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
 		ID:        uuid.New(),
@@ -58,8 +58,8 @@ func handlerRegister(s *state, cmd command) error {
 }
 
 func handlerUsers(s *state, cmd command) error {
-	if len(cmd.username) != 0 {
-		return fmt.Errorf("usage: %s", cmd.name)
+	if len(cmd.Args) != 0 {
+		return fmt.Errorf("usage: %s", cmd.Name)
 	}
 
 	params, err := s.db.GetUsers(context.Background())
@@ -75,17 +75,5 @@ func handlerUsers(s *state, cmd command) error {
 		}
 	}
 
-	return nil
-}
-
-func handlerReset(s *state, cmd command) error {
-	if len(cmd.username) != 0 {
-		return fmt.Errorf("usage: %s", cmd.name)
-	}
-
-	err := s.db.DeleteUsers(context.Background())
-	if err != nil {
-		return fmt.Errorf("failed to reset database: %s", err)
-	}
 	return nil
 }
