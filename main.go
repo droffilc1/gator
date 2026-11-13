@@ -11,8 +11,8 @@ import (
 )
 
 type state struct {
-	db     *database.Queries
-	config *config.Config
+	db  *database.Queries
+	cfg *config.Config
 }
 
 func main() {
@@ -29,8 +29,8 @@ func main() {
 	dbQueries := database.New(db)
 
 	programState := &state{
-		db:     dbQueries,
-		config: &cfg,
+		db:  dbQueries,
+		cfg: &cfg,
 	}
 
 	cmds := commands{
@@ -41,6 +41,7 @@ func main() {
 	cmds.register("reset", handlerReset)
 	cmds.register("users", handlerUsers)
 	cmds.register("agg", handlerAgg)
+	cmds.register("addfeed", handlerAddFeed)
 
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")

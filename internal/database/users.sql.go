@@ -52,14 +52,19 @@ func (q *Queries) DeleteUsers(ctx context.Context) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT name FROM users WHERE name = $1
+SELECT id, created_at, updated_at, name FROM users WHERE name = $1
 `
 
-func (q *Queries) GetUser(ctx context.Context, name string) (string, error) {
+func (q *Queries) GetUser(ctx context.Context, name string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, name)
-	var name_2 string
-	err := row.Scan(&name_2)
-	return name_2, err
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+	)
+	return i, err
 }
 
 const getUsers = `-- name: GetUsers :many
