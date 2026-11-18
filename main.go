@@ -7,6 +7,7 @@ import (
 
 	"github.com/droffilc1/gator/internal/config"
 	"github.com/droffilc1/gator/internal/database"
+
 	_ "github.com/lib/pq"
 )
 
@@ -42,11 +43,12 @@ func main() {
 	cmds.register("reset", handlerReset)
 	cmds.register("users", handlerUsers)
 	cmds.register("agg", handlerAgg)
-	cmds.register("addfeed", middlewareLoggedIn(handlerAddFeed))
 	cmds.register("feeds", handlerListFeeds)
+	cmds.register("addfeed", middlewareLoggedIn(handlerAddFeed))
 	cmds.register("follow", middlewareLoggedIn(handlerFollow))
 	cmds.register("following", middlewareLoggedIn(handlerListFollows))
 	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
+	cmds.register("browse", middlewareLoggedIn(handlerBrowse))
 
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")

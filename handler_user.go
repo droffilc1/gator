@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -38,7 +37,7 @@ func handlerRegister(s *state, cmd command) error {
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Args) != 1 {
-		return errors.New("username is required")
+		return fmt.Errorf("usage: %v <name>", cmd.Name)
 	}
 
 	name := cmd.Args[0]
